@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+  body, html {
+    height: 100%;
+  }
+
+  #drop-area {
+    border: 2px dashed #ccc;
+    border-radius: 20px;
+    width: 80%;
+    height: 70%;
+    margin: 100px auto;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  #drop-area:hover{
+    border-color: black;
+    background: #ededff;
+  }
+
+  .split {
+    height: 100%;
+    width: 50%;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    overflow-x: hidden;
+    padding-top: 20px;
+  }
+  .left {
+    left: 0;
+  }
+  .right {
+    right: 0;
+  }
+  .centered {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+
+  p.text, h3 {
+    font: normal 2em fantasy;
+  }
+</style>
+
+<div style="text-align: center;">
+  <div id="error" align="center" style="width: 100%; display: none" class="alert alert-danger">
+  </div>
+</div>
+
+<div class="split left">
+  <div class="centered">
+    <h3>Choose bitrate:</h3>
+    <select class="browser-default custom-select">
+      <option value="1">128</option>
+      <option value="2">160</option>
+      <option value="3">192</option>
+      <option value="4">224</option>
+      <option value="5">256</option>
+      <option selected value=6>320</option>
+    </select>
+  <br/><br/>
+    <h3>Specify output file name:</h3>
+    <input type="text" class="form-control" placeholder="Type it here, no '.mp3' needed"/>
+  </div>
+</div>
+
+<div class="split right">
+  <div id="drop-area" onclick="clickForFile()">
+    <p class="text">Click to choose a WAV file or drop it here</p>
+  </div>
+  <input id="file-input" type="file" name="name" style="display: none;" />
+</div>
+
+<script>
+  var sendFile = function(file){
+    var formData = new FormData();
+    formData.append("file", file);
+
+    var error = document.getElementById('error')
+
+    var req = {
+        url: "/getfile",
+        method: "post",
+        processData: false,
+        contentType: false,
+        data: formData,
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+          if (XMLHttpRequest.status == 400) {
+            error.innerHTML = "<strong>Error!</strong> WAV only"
+            error.style.display = "inline-block";
+          } else if (XMLHttpRequest.status >= 500) {
+            error.innerHTML = "<strong>Some unexpected server error occured!</strong>"
+            error.style.display = "inline-block";
+          }
+        },
+        success: function(data) {
+          var fname = data.filename;
+          window.location.href = '/file/'+fname;
+        }
+      }
+    var promise = $.ajax(req);
+  };
+
+  var dragHandler = function(evt){
+    evt.preventDefault();
+  };
+
+  var dropHandler = function(evt){
+    evt.preventDefault();
+    var files = evt.originalEvent.dataTransfer.files;
+    sendFile(files[0]);
+  };
+
+  var dropHandlerSet = {
+    dragover: dragHandler,
+    drop: dropHandler
+  };
+
+  $("#drop-area").on(dropHandlerSet);
+
+  var clickForFile = function(){
+    var input = document.getElementById('file-input');
+    $(input).trigger('click');
+    input.onchange = e => {
+      var file = e.target.files[0];
+      sendFile(file);
+    }
+  };
+
+</script>
+
+{% endblock %}
