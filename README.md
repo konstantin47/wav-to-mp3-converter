@@ -1,1 +1,1 @@
-# wav-to-mp3-converter
+# WAV to MP3 converter
