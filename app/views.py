@@ -24,5 +24,12 @@ def getfile():
     if fileob.filename.split('.')[-1] != 'wav':
         return 'WAV only!', 400
 
-    response = jsonify(filename=fname)
+    filename = fileob.name
+
+    response = jsonify(filename=filename)
     return make_response(response, 201)
+
+
+@app.route("/convert", methods=["POST"])
+def convert():
+    pass

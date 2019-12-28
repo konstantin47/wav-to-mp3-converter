@@ -18,6 +18,10 @@ _mailinglist
 .idea/
 docs/_build/
 
+# Static
+app/download/*
+app/upload/*
+
 # Coverage reports
 htmlcov/
 .coverage

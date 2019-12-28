@@ -75,9 +75,13 @@
 
 <div class="split right">
   <div id="drop-area" onclick="clickForFile()">
-    <p class="text">Click to choose a WAV file or drop it here</p>
+    <p id='filetext' class="text">Click to choose a WAV file or drop it here</p>
   </div>
   <input id="file-input" type="file" name="name" style="display: none;" />
+</div>
+
+<div class="fixed-bottom">
+  <button type='button' id="convert" class="btn btn-block btn-success" onclick="convert()" disabled>Convert</button>
 </div>
 
 <script>
@@ -102,10 +106,6 @@
             error.style.display = "inline-block";
           }
         },
-        success: function(data) {
-          var fname = data.filename;
-          window.location.href = '/file/'+fname;
-        }
       }
     var promise = $.ajax(req);
   };
@@ -132,7 +132,16 @@
     $(input).trigger('click');
     input.onchange = e => {
       var file = e.target.files[0];
-      sendFile(file);
+      if (file.name.split('.').pop() !== 'wav'){
+        var error = document.getElementById('error')
+        error.innerHTML = "<strong>Error!</strong> WAV only"
+        error.style.display = "inline-block";
+      } else {
+        var button = document.getElementById('convert')
+        button.removeAttribute("disabled");
+        document.getElementById('filetext').innerHTML = file.name
+        sendFile(file);
+      }
     }
   };
 
